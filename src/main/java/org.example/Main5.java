@@ -1,14 +1,30 @@
+package org.example;
+
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+
 public class Main5 {
     public static void main(String[] args) throws Exception {
         // Zookeeper集群地址，多个节点地址可以用逗号分隔
         String zkAddress = "127.0.0.1:2181";
         // 重试策略，如果连接不上ZooKeeper集群，会重试三次，重试间隔会递增
-        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000,3);
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
         // 创建Curator Client并启动，启动成功之后，就可以与Zookeeper进行交互了
         CuratorFramework client = CuratorFrameworkFactory
-           .newClient(zkAddress, retryPolicy);
+                .newClient(zkAddress, retryPolicy);
         client.start();
-      
+
         // 创建NodeCache，监听的是"/user"这个节点
         NodeCache nodeCache = new NodeCache(client, "/user");
         // start()方法有个boolean类型的参数，默认是false。如果设置为true，
@@ -16,8 +32,8 @@ public class Main5 {
         // 数据内容，并保存在Cache中。
         nodeCache.start(true);
         if (nodeCache.getCurrentData() != null) {
-            System.out.println("NodeCache节点初始化数据为：" 
-                + new String(nodeCache.getCurrentData().getData()));
+            System.out.println("NodeCache节点初始化数据为："
+                    + new String(nodeCache.getCurrentData().getData()));
         } else {
             System.out.println("NodeCache节点数据为空");
         }
